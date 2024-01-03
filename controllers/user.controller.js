@@ -19,7 +19,7 @@ let users_controller = async (req,res)=>{
          }else if(!user_details){
             let details = new userDetailModel({address:req.body.address , user_id:flag.user_id});
             await details.save();
-            return res.send({message:"user details updated successfully"})
+            return res.send({message:"user details updated successfully" , data : flag})
          }
         return res.send({message:"user is persent" , data:flag})
      } catch (error) {
@@ -27,15 +27,32 @@ let users_controller = async (req,res)=>{
      }
 }
 
-
+let get_user_details_who_buy_plan = async (req, res) => {
+   try {
+      let total = await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}]});
+      if(total.total_profit.length===0){
+         return res.send({message: "data is persent" , data:{total_profit:0 , recent_profit:0 , recent_reffrals:0 , user_id:total.user_id , wallet_address:total.address , parent_address : total.parent_wallet_address}})
+      }
+  } catch (error) {
+     return console.error(error);
+  }
+}
 
 
 let users_getAllDetails_controller = async (req,res)=>{
-    console.log(req.body )
     try {
-       
-        let flag  = await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}] , 'total_profit':{ $gt: {'time': new Date(Date.now() - 24*60*60 * 1000) }}})
         let total = await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}]});
+        if(!total){
+         return res.send({message : "Not found",data:[]})
+       }
+        if(total.total_profit.length===0){
+           return res.send({message: "data is persent" , data:{total_profit:0 , recent_profit:0 , recent_reffrals:0 , user_id:total.user_id , wallet_address:total.address , parent_address : total.parent_wallet_address}})
+        }
+        let flag  = await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}] , 'total_profit':{ $gt: {'time': new Date(Date.now() - 24*60*60 * 1000) }}})
+        if( !flag){
+         let resp=await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}]});
+         return res.send({meesage:"No profit available" , data:resp})
+        }
         let total_sum = total.total_profit.reduce((acc,cv)=> acc + cv.profit , 0);
         let arr = flag.total_profit
         let sum = arr.reduce((acc,cv)=> acc + cv.profit , 0);

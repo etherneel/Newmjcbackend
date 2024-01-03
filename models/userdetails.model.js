@@ -4,7 +4,7 @@ import helper from "../commonHelper/helper.js";
 let userDetailSchema = new mongoose.Schema({
     address : helper.reqString,
     user_id : helper.reqNumber,
-    total_profit : {type:Array , default : [{time: new Date() , profit:0}]},
+    total_profit : {type:Array , default : []},
     refrrals:{type:Number , default : 0}
 }
 )
