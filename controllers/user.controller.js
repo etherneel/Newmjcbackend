@@ -43,8 +43,16 @@ let users_getAllDetails_controller = async (req,res)=>{
     try {
         let total = await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}]});
         if(!total){
-         return res.send({message : "Not found",data:[]})
-       }
+          let userIs= await userModel.findOne({user_id:req.body.user_id});
+          if(!userIs){
+            return res.send({message : "user is Not found"})
+          }
+          let resp = new userDetailModel({user_id : req.body.user_id , address:userIs.address});
+          await resp.save();
+          let userdetails = await userDetailModel.findOne({user_id:req.body.user_id});
+          return res.send({message : "User is found successfully " , data:userdetails})
+        }
+        
         if(total.total_profit.length===0){
            return res.send({message: "data is persent" , data:{total_profit:0 , recent_profit:0 , recent_reffrals:0 , user_id:total.user_id , wallet_address:total.address , parent_address : total.parent_wallet_address}})
         }
