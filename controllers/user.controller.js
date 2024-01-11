@@ -1,4 +1,3 @@
-import planModel from "../models/plan_buy.model.js";
 import userModel from "../models/user.model.js";
 import userDetailModel from "../models/userdetails.model.js";
 
@@ -8,8 +7,13 @@ let users_controller = async (req,res)=>{
          let flag  = await userModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}]})
          let user_details = await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}]})
          if(!flag && !user_details){
-            let _id = index[index.length-1]; 
-            let id = _id.user_id + 1;
+            let id
+            if(index.length > 0){
+               let _id = index[index.length-1]; 
+                id = _id.user_id + 1;
+            }else{
+               id=0
+            }
             let details = new userDetailModel({address:req.body.address , user_id:id});
             let user = new userModel({...req.body , user_id:id})
             await user.save();

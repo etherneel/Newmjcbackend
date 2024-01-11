@@ -5,6 +5,7 @@ import plan_buyRouter from './routes/plan_buy.route.js';
 import cors from 'cors'
 import profile_router from './routes/profile.route.js';
 import steck_router from './routes/steck.route.js';
+import userChainRouter from './routes/user_chain.route.js';
 let app = express();
 app.use(express.json());
 app.use(cors());
@@ -18,6 +19,7 @@ app.use('/v1', userroute);
 app.use('/v1' , plan_buyRouter);
 app.use('/profile',profile_router)
 app.use('/steck' , steck_router)
+app.use('/get' , userChainRouter)
 app.use( '/profile' ,express.static('profiles'))
 app.listen(3200 , async()=>{
     try {
