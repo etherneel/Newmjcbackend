@@ -58,12 +58,14 @@ let users_getAllDetails_controller = async (req,res)=>{
         }
         
         if(total.total_profit.length===0){
-           return res.send({message: "data is persent" , data:{total_profit:0 , recent_profit:0 , recent_reffrals:0 , user_id:total.user_id , wallet_address:total.address , parent_address : total.parent_wallet_address}})
+           return res.send({message: "data is present" , data:{total_profit:0 , recent_profit:0 , recent_reffrals:0 , user_id:total.user_id , wallet_address:total.address , parent_address : total.parent_wallet_address}})
         }
         let flag  = await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}] , 'total_profit':{ $gt: {'time': new Date(Date.now() - 24*60*60 * 1000) }}})
         if( !flag){
          let resp=await userDetailModel.findOne({$or:[{address:req.body.address} , {user_id:req.body.user_id}]});
-         return res.send({meesage:"No profit available" , data:resp})
+         let arr = resp.total_profit
+         let sum = arr.reduce((acc,cv)=> acc + cv.profit , 0);
+         return res.send({message:"No recent profit available" , data:{total_profit:sum , recent_profit:0 , recent_reffrals:0 , user_id:resp.user_id , wallet_address:resp.address , parent_address : resp.parent_wallet_address , total_profit_array:resp.total_profit}})
         }
         let total_sum = total.total_profit.reduce((acc,cv)=> acc + cv.profit , 0);
         let arr = flag.total_profit

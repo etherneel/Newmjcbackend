@@ -4,11 +4,8 @@ import userDetailModel from "../models/userdetails.model.js";
 import userChainModel from "../models/users_chain.model.js";
 
 let plan_post_controller = async(req,res) =>{
-
-  
-    try {   
+    try {
         let parent_details = await userDetailModel.findOne({address:req.body.parent_wallet_id});
-        // console.log(parent_details)
         let value = req.body.buyed_plan[0].amount
         let val = req.body.buyed_plan[0].amount
         value = value - (value*(0.15))
